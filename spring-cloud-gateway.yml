@@ -1,0 +1,51 @@
+spring:
+  cloud:
+    gateway: 
+      routes:
+      - id: 
+          add
+        uri:
+          lb://ms-addition
+        predicates:
+        - Path=/add
+        - Query=a
+        - Query=b
+      - id: 
+          addConstant
+        uri:
+          lb://ms-addition
+        predicates:
+        - Path=/addConstant
+        - Query=a
+      - id: 
+          distance
+        uri: 
+          lb://feign-distance
+        predicates:
+        - Path=/distance
+        - Query=ax
+        - Query=ay
+        - Query=bx
+        - Query=by
+      - id: 
+          multiply
+        uri: 
+          lb://ms-multiplication
+        predicates:
+        - Path=/multiply
+        - Query=a
+        - Query=b
+        filters:
+        - RewritePath=/multiply(?<segment>.*), /multi$\{segment}
+
+server:
+  port: 8030
+  
+eureka:
+  instance:
+    hostname: ${host.instance.name:localhost}
+    leaseRenewalIntervalInSeconds: 5
+  client:
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
